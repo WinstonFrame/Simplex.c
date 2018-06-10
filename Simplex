@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+int main()
+{   setlocale(LC_CTYPE,"Russian");
+    FILE *f;
+    if ((f=fopen("4.txt","r"))==NULL)
+        {
+          perror("Îøèáêà ïðè îòêðûòèè ôàéëà");
+          return 1;
+        }
+    int i,j,n,m,k,r,lg1, lg2;
+    fscanf(f,"%d %d",&n, &m);
+    double a[n][m],b[n],c[m],d[m],sb[n],s,L,A[n][m],B[n];
+    for (j=0;j<m;j++)
+        fscanf(f,"%lf",&c[j]);
+    for (i=0;i<n;i++)
+        {
+            fscanf(f,"%lf",&sb[i]);
+            fscanf(f,"%lf",&b[i]);
+            for (j=0;j<m;j++)
+            fscanf(f,"%lf",&a[i][j]);
+        }
+    printf("\tÈñõîäíûå äàííûå:\n\t     ");
+    for (j=0;j<m;j++)
+        printf("%6.2lf",c[j]);
+    printf("\n\n");
+    for (i=0;i<n;i++)
+        {
+            printf("%6.2lf %6.2lf",sb[i],b[i]);
+            for (j=0;j<m;j++)
+                printf("%6.2lf",a[i][j]);
+            printf("\n");
+        }
+    for (j=0;j<m;j++)
+        {
+            s=0;
+            L=0;
+            for (i=0;i<n;i++)
+                {
+                    L+=b[i]*sb[i];
+                    s+=sb[i]*a[i][j];
+                }
+            d[j]=s-c[j];
+        }
+    printf("\n       %6.2f",L);
+    for (j=0;j<m;j++)
+        printf("%6.2f",d[j]);
+    printf("\n");
+    lg1=lg2=0;
+    for (j=0;j<m;j++)
+        {
+            if (d[j]<0)
+                {
+                    lg1=1;
+                    for (i=0;i<n;i++)
+                        if (a[i][j]>0)
+                            lg2=1;
+                }
+        }
+    while ((lg1)&&(lg2))
+  {
+    k=r=0;
+    for(j=0;j<m;j++)
+        {
+            if (d[j]<d[k])
+                k=j;
+            else
+                if (d[j]==d[k])
+                    {
+                        if (c[j]>c[k])
+                            k=j;
+                    }
+        }
+    for (i=0;i<n;i++)
+        if ((b[i]/a[i][k])>(b[r]/a[r][k]))
+            r=i;
+    printf("Ðàçðåøàþùèé ýëåìåíò: à[%d,%d]=%6.2f\n",r+1,k+1,a[r][k]);
+    for (i=0;i<n;i++)
+        {
+            for (j=0;j<m;j++)
+                {
+                    if (i!=r)
+                        {
+                            B[i]=(b[i]*a[r][k]-b[r]*a[i][k])/a[r][k];
+                            A[i][j]=(a[i][j]*a[r][k]-a[r][j]*a[i][k])/a[r][k];}
+                    else
+                        {
+                            B[i]=b[i]/a[r][k];
+                            A[i][j]=a[i][j]/a[r][k];
+                        }
+                }
+        }
+    sb[r]=c[k];
+    printf(" \n             ");
+    for (j=0;j<m;j++)
+        printf("%6.2f",c[j]);
+        printf("\n\n");
+    for (i=0;i<n;i++)
+        {
+            printf("%6.2f %6.2f",sb[i],B[i]);
+            for (j=0;j<m;j++)
+                {
+                    printf("%6.2f",A[i][j]);
+                }
+            printf("\n");
+        }
+    for (j=0;j<m;j++)
+        {
+            s=0;
+            L=0;
+            for (i=0;i<n;i++)
+                {
+                    L+=B[i]*sb[i];
+                    s+=sb[i]*A[i][j];
+                }
+            d[j]=s-c[j];
+        }
+    printf("\n");
+    printf("       %6.2f",L);
+    for (j=0;j<m;j++)
+        printf("%6.2f",d[j]);
+    printf("\n");
+    for (i=0;i<n;i++)
+        {
+            for (j=0;j<m;j++)
+                {
+                    a[i][j]=A[i][j];
+                    b[i]=B[i];
+                }
+        };
+    lg1=lg2=0;
+    for (j=0;j<m;j++)
+        {
+            if (d[j]<0)
+            {
+                lg1=1;
+                for (i=0;i<n;i++)
+                    if (A[i][j]>0)
+                        lg2=1;
+            }
+        }
+  }
+    if (lg1)
+        printf("\nÖåëåâàÿ ôóíêöèÿ íå îãðàíè÷åíà ñâåðõó íà ìíîæåñòâå ïëàíîâ.\n");
+    else
+        {
+            printf("\nÎïòèìàëüíûé ïëàí: Õ=(");
+            for (j=0;j<m;j++)
+                printf("%5.2f,",c[j],L);
+            printf(").\nL=%6.2f",L);
+        }
+
+    fclose(f);
+    getch();
+    return 0;
+}
